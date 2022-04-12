@@ -12,7 +12,10 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Auth::routes();
+Route::get('/{vue_capture?}', function () {
+    return view('layouts.app');
+})->where('vue_capture', '[\/\w\.-]*');//->middleware('auth')
 
+Auth::routes(['verify' => true]);
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
