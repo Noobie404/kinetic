@@ -6,6 +6,7 @@ import App from './App.vue';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 import store from "./store";
+import Toaster from '@meforma/vue-toaster';
 // import "./assets/css/style.css";
 // import "./assets/css/color-theme1.css";
 // import "line-awesome/dist/line-awesome/css/line-awesome.min.css";
@@ -18,4 +19,5 @@ createApp(App)
 .use(router, router)
 .use(reactive)
 .use(store)
+.use(Toaster)
 .mount('#app')

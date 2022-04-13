@@ -93,7 +93,7 @@ export default {
     },
     computed: {
         loggedIn() {
-            return this.$store.state.auth.status.loggedIn;
+            return this.$store.state.auth.initialState.status.loggedIn;
         },
         passwordToggleIcon() {
             return this.passwordFieldType === 'password' ? 'far fa-eye' : 'far fa-eye-slash';

@@ -2,15 +2,8 @@ import UserService from '../services/user.service';
 export const user = {
     namespaced: true,
     state: {
-        product: {},
-        is_product : 2,
-        is_related_product : 2,
-        category:[],
-        subcategory:[],
-        galleries:[],
-        realated_product:[],
-        title : 'Easybazar',
-        image_path:'http://admin.easybazar.com'
+        toastMessage : '',
+        toastType : '',
     },
     actions: {
         getAllCustomers({ commit,dispatch }) {
@@ -20,8 +13,7 @@ export const user = {
                     commit('getAllCustomers',res);
                 },
                 error => {
-                    commit('fetchFailure',error.response.statusText);
-                    console.log(error.response.statusText);
+                    commit('fetchFailure',error);
                     return Promise.reject(error);
                 }
             ).catch(function (error) {
@@ -40,6 +32,14 @@ export const user = {
             }else{
                 state.is_product        = 0;
             }
+        },
+        fetchFailure(state, res) {
+            // state.status.CustomerloggedIn = true;
+            // state.status.loggedIn = false;
+            state.toastMessage = res.response.statusText;
+            state.toastType = 'error';
+
+            console.log(state.toastMessage);
         },
     }
 };

@@ -20,7 +20,8 @@ Route::namespace('App\Http\Controllers\Api')->group(function () {
     Route::post('customer/login', [ 'uses' => 'CustomerAuthController@postLogin']);
     Route::get('region-list', 'AuthController1@user');
 
-    Route::group(['middleware' => 'jwt.verify'], function(){
+    // Route::group(['middleware' => 'jwt.verify'], function(){
+    Route::group(['middleware' => ['jwt.role:admin', 'jwt.auth']], function(){
         Route::get('customer/list', 'CustomerController@allCustomers');
         Route::get('user', 'AuthController@user');
         Route::post('logout', 'AuthController@logout');

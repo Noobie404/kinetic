@@ -16,7 +16,8 @@
                     <li class="nav-item dropdown" @click.prevent="toggleUserDrop">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            {{ user.name }}
+                            {{ currentUser ?? '' }}
+                            {{ user ?? '' }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown" :style="'display:'+activeHover">
                             <a href="javascript:void(0)" class="dropdown-item" @click.prevent="logOut">
@@ -93,7 +94,7 @@ export default {
     data() {
         return {
             activeHover : 'none',
-            user : {},
+            user : '',
         }
     },
     methods: {
@@ -109,8 +110,11 @@ export default {
             }
         },
     },
-    mounted() {},
+    mounted() {
+        },
     created() {
+        this.user = this.$store.state.auth.initialState.user.user.name;
+        console.log(this.user);
         console.log(this.loggedIn);
         if (!this.loggedIn) {
             this.$router.push("/login");
@@ -133,16 +137,29 @@ export default {
     },
     computed: {
         loggedIn() {
-            return this.$store.state.auth.status.loggedIn;
+            return this.$store.state.auth.initialState.status.loggedIn;
         },
         currentUser() {
-            // console.log(this.$store.state.auth.user.user);
-            return this.$store.state.auth.user.user;
+            console.log(this.$store.state.auth.initialState.user.user);
+            return this.$store.state.auth.initialState.user.user;
+        },
+        toastMessage(){
+            return this.$store.state.user.toastMessage;
         },
     },
     filters: {
     },
     watch: {
+        '$route': 'reInitialize',
+        toastMessage(val) {
+            if (val) {
+                this.$toast.show(val, {
+                    type: this.$store.state.user.toastType,
+                    position:'top-right',
+                });
+                setTimeout(this.$toast.clear, 30000)
+            }
+        },
     },
 }
 </script>

@@ -25,9 +25,9 @@ class CustomerController extends Controller
 
     public function __construct()
     {
-        $this->user = JWTAuth::parseToken()->authenticate();
+        // $this->user = JWTAuth::parseToken()->authenticate();
     }
-    public function allCustomers(Request $request)
+    public function allCustomers()
     {
         $customers = Customer::all();
         if (!$customers) {
@@ -36,7 +36,7 @@ class CustomerController extends Controller
                 'errors' => 'Customers not found !'
             ], 400);
         }
-        // dd($customers);
+        // dd(1);
         return response()->json(['status' => 'successs','data'=>$customers], 200);
     }
 }
