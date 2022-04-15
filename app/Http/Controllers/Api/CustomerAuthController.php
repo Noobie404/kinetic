@@ -1,72 +1,53 @@
 <?php
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use Carbon\Carbon;
-use App\Traits\SMS;
-use App\Traits\MAIL;
+use JWTAuth;
 use App\Models\Customer;
-use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Mail\Mailer;
-// use App\Repositories\Api\Cart\CartInterface;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Requests\ChangePasswordRequest;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class CustomerAuthController extends Controller
 {
     public function __construct()
     {
-        // $this->middleware('auth:customer');
-        // if ( isset(Auth::guard('customer')->user()->f_user_id) ) {
-        //     $this->middleware( 'guest:customer', [ 'except' => [ 'login' ] ] );
-        // } else {
-        //     $this->middleware( 'auth:api', [ 'except' => [ 'login' ] ] );
-        // }
     }
     public function postLogin(Request $request)
     {
-        $data = [];
-        $local = $request->header('accept-language');
-
-        $validator = Validator::make($request->all(), [
-            'email' => 'required',
-            'password' => 'required|min:6',
+        $credentials = $request->only('email', 'password');
+        $validator = Validator::make($credentials, [
+            'email' => 'required|email',
+            'password' => 'required|string|min:6|max:50'
         ]);
+
         if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'errors' => 'oops! You have entered invalid credentials!'
-            ], 401);
+            return response()->json(['error' => $validator->messages()], 200);
         }
-        if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
-            $data = [
-                'email' => $request->email,
-                'password' => $request->password
-            ];
+        try {
             $check = Customer::where('email',$request->email)->first();
-            // dd($check);
             if (!$check) {
                 return response()->json([
                     'status' => 'error',
-                    'errors' => 'User not found !'
-                ], 401);
+                    'errors' => 'Customer not found !'
+                ], 400);
             }
-        }else{
+            Config::set('auth.providers.users.model', \App\Customer::class);
+            Auth::shoulduse('customer');
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Login credentials are invalid.',
+                ], 400);
+            }
+        } catch (JWTException $e) {
+        return $credentials;
             return response()->json([
-                'status' => 'error',
-                'errors' => 'Invalid email address'
-            ], 401);
-        }
-        if (! $token = Auth::guard('customer')->attempt($data)) {
-            return response()->json([
-                'status' => 'error',
-                'errors' => 'oops! You have entered invalid credentials!'
-            ], 401);
+                    'status' => false,
+                    'message' => 'Could not create token.',
+                ], 500);
         }
         $format_response = $this->createNewToken($token,$check);
         return response()->json(['status' => 'successs','data'=>$format_response], 200)->header('Authorization', $token);
@@ -86,7 +67,8 @@ class CustomerAuthController extends Controller
         return [
             'id'         => $user->id,
             'name'       => $user->name,
-            'email'      => $user->email
+            'email'      => $user->email,
+            'is_admin'   => $user->is_admin
         ];
     }
 

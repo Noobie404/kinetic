@@ -17,5 +17,3 @@ Route::get('/{vue_capture?}', function () {
 })->where('vue_capture', '[\/\w\.-]*');//->middleware('auth')
 
 Auth::routes(['verify' => true]);
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-

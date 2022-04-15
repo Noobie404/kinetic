@@ -4,12 +4,13 @@ export const user = {
     state: {
         toastMessage : '',
         toastType : '',
+        CustomerList : {},
+        CustomerInfo : {},
     },
     actions: {
-        getAllCustomers({ commit,dispatch }) {
+        getAllCustomers({ state, commit, rootState }) {
             return UserService.getAllCustomers().then(
                 res => {
-                    console.log(res);
                     commit('getAllCustomers',res);
                 },
                 error => {
@@ -17,7 +18,22 @@ export const user = {
                     return Promise.reject(error);
                 }
             ).catch(function (error) {
-                console.log('errorqwqwqw: ', error.response.status);
+
+                commit('auth/unauthorized', null, { root: true });
+                return Promise.reject(error);
+            });
+        },
+        deleteCustomer({ state, commit, rootState },id) {
+            return UserService.deleteCustomer(id).then(
+                res => {
+                    commit('successAction',res);
+                },
+                error => {
+                    commit('fetchFailure',error);
+                    return Promise.reject(error);
+                }
+            ).catch(function (error) {
+                commit('auth/unauthorized', null, { root: true });
                 return Promise.reject(error);
             });
         },
@@ -25,21 +41,16 @@ export const user = {
     mutations: {
         getAllCustomers(state,res) {
             if (res.data.status == 1) {
-                state.is_product        = 1;
-                state.product           = res.data.data.product_data;
-                state.galleries         = res.data.data.galleries;
-                state.title             = 'Easybazar-'+ state.product.VARIANT_NAME;
-            }else{
-                state.is_product        = 0;
+                state.CustomerList = res.data.data;
             }
         },
         fetchFailure(state, res) {
-            // state.status.CustomerloggedIn = true;
-            // state.status.loggedIn = false;
             state.toastMessage = res.response.statusText;
             state.toastType = 'error';
-
-            console.log(state.toastMessage);
+        },
+        successAction(state, res) {
+            state.toastMessage = res.data.msg;
+            state.toastType = 'success';
         },
     }
 };

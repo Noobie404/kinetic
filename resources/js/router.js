@@ -1,11 +1,16 @@
 import { createWebHistory, createRouter } from "vue-router";
 import Login from './auth/admin/login.vue';
 import CustomerLogin from './auth/customer/login.vue';
-import Home from './components/Home.vue';
-import CustomerHome from './components/CustomerHome.vue';
+import CustomerList from './components/admin/customer/CustomerList.vue';
+import CreateCustomer from './components/admin/customer/CreateCustomer.vue';
+import EditCustomer from './components/admin/customer/EditCustomer.vue';
+import BillList from './components/admin/bill/BillList.vue';
+import CreateBill from './components/admin/bill/CreateBill.vue';
+import EditBill from './components/admin/bill/EditBill.vue';
+import CustomerBills from './components/customer/bill/CustomerBills.vue';
 const  routes = [
         { path: '',
-        redirect: { name: 'Home' }
+        redirect: { name: 'CustomerList' }
         },
         {
             name: 'Login',
@@ -24,22 +29,70 @@ const  routes = [
             }
         },
         {
-            name: 'Home',
+            name: 'CustomerList',
             path: '/',
-            component: Home,
+            component: CustomerList,
             meta: {
                 title: 'Kinetik | Admin Panel',
             }
         },
         {
-            name: 'CustomerHome',
-            path: '/customer',
-            component: CustomerHome,
+            name: 'CustomerList',
+            path: '/customers',
+            component: CustomerList,
+            meta: {
+                title: 'Kinetik | Admin Panel',
+            }
+        },
+        {
+            name: 'CreateCustomer',
+            path: '/customer/new',
+            component: CreateCustomer,
+            meta: {
+                title: 'Kinetik | Create Customer',
+            }
+        },
+        {
+            name: 'EditCustomer',
+            path: '/customer/edit/:id',
+            component: EditCustomer,
+            meta: {
+                title: 'Kinetik | Rdit Customer',
+            }
+        },
+        {
+            name: 'BillList',
+            path: '/bills',
+            component: BillList,
+            meta: {
+                title: 'Kinetik | Bills',
+            }
+        },
+        {
+            name: 'CreateBill',
+            path: '/bill/new',
+            component: CreateBill,
+            meta: {
+                title: 'Kinetik | Create Customer',
+            }
+        },
+        {
+            name: 'EditBill',
+            path: '/bill/edit/:id',
+            component: EditBill,
+            meta: {
+                title: 'Kinetik | Edit Bill',
+            }
+        },
+        {
+            name: 'CustomerBills',
+            path: '/customer/bills',
+            component: CustomerBills,
             meta: {
                 title: 'Kinetik | Customer Panel',
             }
         },
-];
+    ];
 
 const router = createRouter({
     history: createWebHistory(),
@@ -47,20 +100,10 @@ const router = createRouter({
     routes: routes,
     linkActiveClass: 'active'
 });
-
 router.beforeEach((to, from) => {
     let documentTtitle = `${process.env.APP_NAME}-${to.name}`;
     if(to.params.title){
         documentTtitle+= `-${to.params.title}`;
     }
 })
-//   router.beforeEach((to, from, next) => {
-//     let language = to.params.lang;
-//     if (!language) {
-//         language = 'en'
-//     }
-//     VueI18n.locale = language
-//     console.log("Active locale: ", VueI18n.locale)
-//     next()
-// })
 export default router;
